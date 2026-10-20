@@ -1,5 +1,7 @@
 // Frontend only draws the UI. All CSP / A* / ML work happens in the FastAPI backend.
-const API = window.location.port === "8000" ? "" : "http://127.0.0.1:8000";
+const API = ["localhost", "127.0.0.1"].includes(window.location.hostname)
+  ? (window.location.port === "8000" ? "" : "http://127.0.0.1:8000")
+  : "https://aiml-mini-pro.onrender.com";
 const $ = (id) => document.getElementById(id);
 const SVG_NS = "http://www.w3.org/2000/svg";
 
