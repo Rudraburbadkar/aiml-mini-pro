@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Intelligent Delivery Planner</title>
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<header class="topbar">
+  <div class="brand"><span class="brand-mark">&#9650;</span> Intelligent Delivery Planner</div>
+  <nav>
+    <a href="#csp" id="nav-csp" class="active">CSP Planner</a>
+    <a href="#route" id="nav-route">Route Simulation</a>
+  </nav>
+</header>
+<div id="toast" class="toast" role="alert" hidden></div>
+
+<!-- ============ PAGE 1: CSP PLANNER ============ -->
+<main id="page-csp" class="page">
+  <div class="page-head">
+    <div>
+      <h1>CSP Delivery Planner</h1>
+      <p class="muted">Assign orders fairly while respecting capacity, availability, and deadlines.</p>
+    </div>
+    <div class="stats">
+      <div class="stat"><b id="st-total">0</b><span>Total Orders</span></div>
+      <div class="stat good"><b id="st-assigned">–</b><span>Assigned</span></div>
+      <div class="stat bad"><b id="st-unassigned">–</b><span>Unassigned</span></div>
+      <div class="stat"><b id="st-partners">0</b><span>Available Partners</span></div>
+    </div>
+  </div>
+
+  <div class="two-col">
+    <section class="panel">
+      <h2>Delivery Orders</h2>
+      <table>
+        <thead><tr><th></th><th>ID</th><th>Destination</th><th>Weight</th><th>Priority</th><th>Deadline</th></tr></thead>
+        <tbody id="orders-body"></tbody>
+      </table>
+    </section>
+    <section class="panel">
+      <h2>Delivery Partners</h2>
+      <table>
+        <thead><tr><th>Partner</th><th>Max</th><th>Assigned</th><th>Remaining</th><th>Availability</th></tr></thead>
+        <tbody id="partners-body"></tbody>
+      </table>
+    </section>
+  </div>
+
+  <div class="actions">
+    <button class="btn primary" id="btn-run">Run CSP Assignment</button>
+    <button class="btn" id="btn-all">Select All</button>
+    <button class="btn" id="btn-clear">Clear Selection</button>
+    <button class="btn" id="btn-reset">Reset Demo</button>
+    <span class="muted small">Simulated data: all partners leave the Warehouse at <b id="sim-start">10:00</b>.</span>
+  </div>
+
+  <div id="csp-message" class="note" hidden></div>
+  <div id="csp-stale" class="note warn" hidden>Selection or availability changed &mdash; run the assignment again to update the results.</div>
+
+  <div class="two-col" id="csp-results">
+    <section class="panel">
+      <h2>Assigned Orders</h2>
+      <ul class="result-list" id="assigned-list"><li class="empty">No assignment run yet.</li></ul>
+    </section>
+    <section class="panel">
+      <h2>Unassigned Orders</h2>
+      <ul class="result-list" id="unassigned-list"><li class="empty">No assignment run yet.</li></ul>
+    </section>
+  </div>
+</main>
+
+<!-- ============ PAGE 2: ROUTE SIMULATION ============ -->
+<main id="page-route" class="page" hidden>
+  <div class="route-head">
+    <h1>Route Simulation</h1>
+    <span class="muted small">A* picks the route &middot; Linear Regression predicts the duration</span>
+  </div>
+  <div class="route-grid">
+    <aside class="panel side">
+      <h2>Route Controls</h2>
+      <label>Start location<input type="text" value="Warehouse" disabled></label>
+      <label>Destination<select id="sel-dest"></select></label>
+      <label>Traffic level
+        <select id="sel-traffic"><option>Low</option><option>Medium</option><option>High</option></select>
+      </label>
+      <label>Delivery stops (0–5)<input type="number" id="in-stops" min="0" max="5" value="1"></label>
+      <label>Road status
+        <select id="sel-road"></select>
+      </label>
+      <button class="btn small-btn" id="btn-block">Block / Unblock road</button>
+      <div id="blocked-list" class="chips"></div>
+      <div class="btn-col">
+        <button class="btn primary" id="btn-find">Find Best Route</button>
+        <button class="btn teal" id="btn-start" disabled>Start Delivery</button>
+        <div class="btn-row">
+          <button class="btn" id="btn-pause" disabled>Pause</button>
+          <button class="btn" id="btn-rreset">Reset</button>
+        </div>
+      </div>
+      <details class="tests">
+        <summary>Algorithm Test</summary>
+        <p class="muted small">Runs A* on three separate Route A/B/C cost cases.</p>
+        <button class="btn small-btn" id="btn-test">Run A* tests</button>
+        <ul id="test-results" class="test-list"></ul>
+      </details>
+    </aside>
+
+    <section class="panel map-panel">
+      <div id="map-note" class="note map-note" hidden></div>
+      <svg id="map" viewBox="0 0 840 520" preserveAspectRatio="xMidYMid meet" aria-label="Road network map"></svg>
+      <div class="legend">
+        <span><i style="background:#0F766E"></i>Selected route</span>
+        <span><i style="background:#CBD5E1"></i>Alternative</span>
+        <span><i style="background:#F59E0B"></i>Traffic</span>
+        <span><i style="background:#DC2626"></i>Blocked</span>
+      </div>
+    </section>
+
+    <aside class="panel side">
+      <h2>Route Details</h2>
+      <div id="route-box" class="info-box"><span class="muted">Choose a destination and click <b>Find Best Route</b>.</span></div>
+      <h2 class="mt">Delivery-Time Prediction</h2>
+      <div id="pred-box" class="info-box"><span class="muted">Prediction appears after a route is found.</span></div>
+      <p class="ml-note">ML estimate &mdash; trained on synthetic demonstration data; not live traffic data.</p>
+    </aside>
+  </div>
+</main>
+<script src="app.js"></script>
+</body>
+</html>
